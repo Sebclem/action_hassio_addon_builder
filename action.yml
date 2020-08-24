@@ -8,10 +8,13 @@ runs:
   using: "composite"
   steps:
     - name: Add Qemu-user-static
+      shell: bash
       run: docker run --rm --privileged hassioaddons/qemu-user-static:latest
     - name: test
+      shell: bash
       run: printenv
     - name: Set Version
+      shell: bash
       if: github.event_name != 'workflow_dispatch'
       run: |
         version=${GITHUB_REF/refs\/tags\//}
@@ -20,6 +23,7 @@ runs:
           jq --arg version "$version" '.version=$version' ${{env.TARGET}}/config.json > "$tmp" && mv "$tmp" ${{env.TARGET}}/config.json
         fi
     - name: Get build option ${{env.BUILD_ARCH}}
+      shell: bash
       run: |
         echo ::set-env name=NAME::"$(jq --raw-output '.name // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
         echo ::set-env name=DESCRIPTION::"$(jq --raw-output '.description // empty' "${{env.TARGET}}/config.json" | sed "s/'//g")"
@@ -33,6 +37,7 @@ runs:
           echo ::set-env name=TAGS::"$(jq --raw-output '.version' "${{env.TARGET}}/config.json")"
         fi
     - name: Debug Env
+      shell: bash
       run: |
         echo ${{env.IMAGE}}
         echo ${{env.VERSION}}
